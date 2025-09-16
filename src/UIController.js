@@ -1,4 +1,4 @@
-import { gsap } from 'gsap';
+import { gsap } from '../node_modules/gsap/index.js';
 
 export class UIController {
     constructor(app) {
