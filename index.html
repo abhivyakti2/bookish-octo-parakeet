@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Bookshelf Library</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="loading" class="loading">
+            <div class="loading-text">Loading your library...</div>
+            <div class="loading-spinner"></div>
+        </div>
+        
+        <div id="ui-overlay" class="ui-overlay">
+            <div class="top-controls">
+                <h1 class="library-title">My Personal Library</h1>
+                <div class="shelf-info">
+                    <span id="current-shelf">TBR Shelf</span>
+                </div>
+            </div>
+            
+            <div class="side-controls">
+                <div class="genre-spinner">
+                    <label>Genre</label>
+                    <div class="spinner-container">
+                        <button class="spinner-btn prev" data-spinner="genre">‹</button>
+                        <div class="spinner-display" id="genre-display">Fiction</div>
+                        <button class="spinner-btn next" data-spinner="genre">›</button>
+                    </div>
+                </div>
+                
+                <div class="rating-filter">
+                    <label>Rating</label>
+                    <div class="rating-stars">
+                        <span class="star active" data-rating="5">★</span>
+                        <span class="star active" data-rating="4">★</span>
+                        <span class="star active" data-rating="3">★</span>
+                        <span class="star active" data-rating="2">★</span>
+                        <span class="star" data-rating="1">★</span>
+                    </div>
+                </div>
+                
+                <div class="shelf-navigation">
+                    <button class="nav-btn" data-shelf="tbr">TBR</button>
+                    <button class="nav-btn active" data-shelf="rated">Rated</button>
+                    <button class="nav-btn" data-shelf="genre">Genre</button>
+                </div>
+            </div>
+            
+            <div class="bottom-controls">
+                <div class="book-info" id="book-info" style="display: none;">
+                    <h3 id="book-title"></h3>
+                    <p id="book-author"></p>
+                    <div id="book-notes"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="book-modal" class="book-modal" style="display: none;">
+            <div class="modal-content">
+                <button class="close-modal">&times;</button>
+                <div class="book-details">
+                    <h2 id="modal-title"></h2>
+                    <p id="modal-author"></p>
+                    <div class="rating-input">
+                        <label>Your Rating:</label>
+                        <div class="rating-input-stars">
+                            <span class="star-input" data-rating="1">★</span>
+                            <span class="star-input" data-rating="2">★</span>
+                            <span class="star-input" data-rating="3">★</span>
+                            <span class="star-input" data-rating="4">★</span>
+                            <span class="star-input" data-rating="5">★</span>
+                        </div>
+                    </div>
+                    <div class="notes-input">
+                        <label>Notes:</label>
+                        <textarea id="book-notes-input" placeholder="Add your thoughts about this book..."></textarea>
+                    </div>
+                    <button id="save-book-data">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="main.js"></script>
+</body>
+</html>
