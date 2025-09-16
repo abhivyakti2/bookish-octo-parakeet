@@ -201,7 +201,8 @@ export class BookshelfManager {
         return {
             x: basePosition.x,
             y: 3,
-            z: 8
+            z: 8,
+            lookAt: { x: basePosition.x, y: 3, z: basePosition.z + 0.3 }
         };
     }
     

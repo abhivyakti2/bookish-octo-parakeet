@@ -50,12 +50,12 @@ export class Book {
         const pageTexture = this.createPageTexture();
         
         return [
-            new THREE.MeshLambertMaterial({ map: spineTexture }), // Right
-            new THREE.MeshLambertMaterial({ map: spineTexture }), // Left
-            new THREE.MeshLambertMaterial({ map: pageTexture }), // Top
-            new THREE.MeshLambertMaterial({ map: pageTexture }), // Bottom
-            new THREE.MeshLambertMaterial({ map: coverTexture }), // Front
-            new THREE.MeshLambertMaterial({ map: coverTexture })  // Back
+            new THREE.MeshStandardMaterial({ map: spineTexture, roughness: 0.65, metalness: 0.05 }), // Right
+            new THREE.MeshStandardMaterial({ map: spineTexture, roughness: 0.65, metalness: 0.05 }), // Left
+            new THREE.MeshStandardMaterial({ map: pageTexture, roughness: 0.9, metalness: 0.0 }), // Top
+            new THREE.MeshStandardMaterial({ map: pageTexture, roughness: 0.9, metalness: 0.0 }), // Bottom
+            new THREE.MeshStandardMaterial({ map: coverTexture, roughness: 0.6, metalness: 0.08 }), // Front
+            new THREE.MeshStandardMaterial({ map: coverTexture, roughness: 0.6, metalness: 0.08 })  // Back
         ];
     }
     
@@ -65,17 +65,17 @@ export class Book {
         canvas.height = 384;
         const context = canvas.getContext('2d');
         
-        // Background color based on genre
-        const colors = {
-            'Fiction': ['#fd79a8', '#fdcb6e'],
-            'Science Fiction': ['#74b9ff', '#a29bfe'],
-            'Fantasy': ['#e17055', '#fd79a8'],
-            'Mystery': ['#636e72', '#b2bec3'],
-            'Romance': ['#fd79a8', '#fab1a0'],
-            'Non-Fiction': ['#00b894', '#55efc4']
+        // Pastel background color by genre
+        const pastelColors = {
+            'Fiction': ['#ffc2e8', '#ffe6f5'],
+            'Science Fiction': ['#cde7ff', '#eae7ff'],
+            'Fantasy': ['#ffd6e7', '#e3f2ff'],
+            'Mystery': ['#dfe6e9', '#f1f2f6'],
+            'Romance': ['#ffdeeb', '#ffe8f3'],
+            'Non-Fiction': ['#d3fff3', '#eafffb']
         };
         
-        const colorPair = colors[this.data.genre] || colors['Fiction'];
+        const colorPair = pastelColors[this.data.genre] || pastelColors['Fiction'];
         const gradient = context.createLinearGradient(0, 0, 0, 384);
         gradient.addColorStop(0, colorPair[0]);
         gradient.addColorStop(1, colorPair[1]);
@@ -83,9 +83,9 @@ export class Book {
         context.fillStyle = gradient;
         context.fillRect(0, 0, 256, 384);
         
-        // Add border
-        context.strokeStyle = '#000000';
-        context.lineWidth = 4;
+        // Soft border
+        context.strokeStyle = 'rgba(255,255,255,0.85)';
+        context.lineWidth = 3;
         context.strokeRect(0, 0, 256, 384);
         
         // Add title
@@ -116,6 +116,7 @@ export class Book {
         context.fillText(this.data.author, 128, 350);
         
         const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace; // ensure correct gamma for pastels
         return texture;
     }
     
@@ -125,18 +126,24 @@ export class Book {
         canvas.height = 384;
         const context = canvas.getContext('2d');
         
-        // Spine color (darker version of cover)
-        const colors = {
-            'Fiction': '#e84393',
-            'Science Fiction': '#6c5ce7',
-            'Fantasy': '#d63031',
-            'Mystery': '#2d3436',
-            'Romance': '#e84393',
-            'Non-Fiction': '#00a085'
+        // Pastel spine color matching cover
+        const pastelSpine = {
+            'Fiction': '#ffb3dd',
+            'Science Fiction': '#bde0fe',
+            'Fantasy': '#ffd6e7',
+            'Mystery': '#e8eaed',
+            'Romance': '#ffc2e8',
+            'Non-Fiction': '#b9fff2'
         };
         
-        context.fillStyle = colors[this.data.genre] || colors['Fiction'];
+        context.fillStyle = pastelSpine[this.data.genre] || pastelSpine['Fiction'];
         context.fillRect(0, 0, 64, 384);
+        
+        // Add subtle sparkly stripes
+        context.fillStyle = 'rgba(255, 255, 255, 0.25)';
+        for (let i = 0; i < 64; i += 6) {
+            context.fillRect(i, 0, 1, 384);
+        }
         
         // Add spine text
         context.save();
@@ -149,6 +156,7 @@ export class Book {
         context.restore();
         
         const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace; // ensure correct gamma for pastels
         return texture;
     }
     
@@ -173,6 +181,7 @@ export class Book {
         }
         
         const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace; // ensure correct gamma for pastels
         return texture;
     }
     

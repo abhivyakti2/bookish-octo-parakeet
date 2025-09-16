@@ -59,24 +59,26 @@ class BookshelfApp {
     }
     
     setupLighting() {
-        // Ambient light for overall illumination
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        // Ambient + hemisphere for soft, rich pastels
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
         this.scene.add(ambientLight);
+        const hemi = new THREE.HemisphereLight(0xfff5f8, 0xf0f4ff, 0.55); // sky, ground
+        this.scene.add(hemi);
         
-        // Main directional light (warm library lighting)
-        const directionalLight = new THREE.DirectionalLight(0xfab1a0, 0.7);
+        // Main directional light (soft pastel tone)
+        const directionalLight = new THREE.DirectionalLight(0xffc2e8, 0.85);
         directionalLight.position.set(10, 10, 5);
         directionalLight.castShadow = true;
         directionalLight.shadow.mapSize.width = 2048;
         directionalLight.shadow.mapSize.height = 2048;
         this.scene.add(directionalLight);
         
-        // Point lights for cozy atmosphere
-        const pointLight1 = new THREE.PointLight(0xfd79a8, 0.4, 20);
+        // Point lights for dreamy pastel accents
+        const pointLight1 = new THREE.PointLight(0xbde0fe, 0.45, 20); // baby blue
         pointLight1.position.set(-5, 8, 3);
         this.scene.add(pointLight1);
         
-        const pointLight2 = new THREE.PointLight(0xe17055, 0.3, 15);
+        const pointLight2 = new THREE.PointLight(0xfff6a3, 0.38, 15); // soft lemon
         pointLight2.position.set(5, 6, -2);
         this.scene.add(pointLight2);
     }
@@ -89,7 +91,7 @@ class BookshelfApp {
             1000
         );
         this.camera.position.set(0, 3, 8);
-        this.camera.lookAt(0, 2, 0);
+        this.camera.lookAt(0, 3, 0.3);
     }
     
     setupRenderer() {
@@ -98,6 +100,9 @@ class BookshelfApp {
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1.0;
+        this.renderer.physicallyCorrectLights = true;
         
         document.getElementById('app').appendChild(this.renderer.domElement);
     }
@@ -133,6 +138,15 @@ class BookshelfApp {
             z: targetPosition.z,
             ease: "power2.inOut"
         });
+        // Keep camera looking straight forward at shelf center
+        if (targetPosition.lookAt) {
+            gsap.to({ t: 0 }, {
+                duration: 1.5,
+                t: 1,
+                ease: "power2.inOut",
+                onUpdate: () => this.camera.lookAt(targetPosition.lookAt.x, targetPosition.lookAt.y, targetPosition.lookAt.z)
+            });
+        }
     }
     
     filterByGenre(genre) {
