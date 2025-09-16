@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import { gsap } from 'gsap';
+import * as THREE from '../node_modules/three/build/three.module.js';
+import { gsap } from '../node_modules/gsap/index.js';
 
 export class InteractionManager {
     constructor(app) {

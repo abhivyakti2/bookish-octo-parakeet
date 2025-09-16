@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import { gsap } from 'gsap';
+import * as THREE from './node_modules/three/build/three.module.js';
+import { gsap } from './node_modules/gsap/index.js';
 import { BookshelfManager } from './src/BookshelfManager.js';
 import { Book } from './src/Book.js';
 import { UIController } from './src/UIController.js';
