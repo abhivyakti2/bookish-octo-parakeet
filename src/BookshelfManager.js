@@ -22,7 +22,7 @@ export class BookshelfManager {
         const woodTexture = this.createWoodTexture();
         const shelfMaterial = new THREE.MeshLambertMaterial({ 
             map: woodTexture,
-            color: 0x8B4513
+            color: 0xfab1a0
         });
         
         // Create shelves for each section
@@ -69,16 +69,16 @@ export class BookshelfManager {
         
         // Create wood grain pattern
         const gradient = context.createLinearGradient(0, 0, 0, 512);
-        gradient.addColorStop(0, '#8B4513');
-        gradient.addColorStop(0.3, '#A0522D');
-        gradient.addColorStop(0.6, '#8B4513');
-        gradient.addColorStop(1, '#654321');
+        gradient.addColorStop(0, '#fab1a0');
+        gradient.addColorStop(0.3, '#e17055');
+        gradient.addColorStop(0.6, '#fab1a0');
+        gradient.addColorStop(1, '#d63031');
         
         context.fillStyle = gradient;
         context.fillRect(0, 0, 512, 512);
         
         // Add wood grain lines
-        context.strokeStyle = '#654321';
+        context.strokeStyle = '#d63031';
         context.lineWidth = 2;
         for (let i = 0; i < 20; i++) {
             context.beginPath();
@@ -98,9 +98,9 @@ export class BookshelfManager {
     createFloor() {
         const floorGeometry = new THREE.PlaneGeometry(30, 20);
         const floorMaterial = new THREE.MeshLambertMaterial({ 
-            color: 0x2F1B14,
+            color: 0xffeaa7,
             transparent: true,
-            opacity: 0.8
+            opacity: 0.6
         });
         
         const floor = new THREE.Mesh(floorGeometry, floorMaterial);
@@ -113,9 +113,9 @@ export class BookshelfManager {
     
     createWalls() {
         const wallMaterial = new THREE.MeshLambertMaterial({ 
-            color: 0x3D2914,
+            color: 0xfab1a0,
             transparent: true,
-            opacity: 0.6
+            opacity: 0.4
         });
         
         // Back wall
@@ -200,8 +200,8 @@ export class BookshelfManager {
         const basePosition = this.shelfPositions[shelfType];
         return {
             x: basePosition.x,
-            y: 5,
-            z: 12
+            y: 3,
+            z: 8
         };
     }
     

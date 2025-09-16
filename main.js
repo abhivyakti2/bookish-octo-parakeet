@@ -52,19 +52,19 @@ class BookshelfApp {
     
     setupScene() {
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x1a0f08);
+        this.scene.background = new THREE.Color(0xffeaa7);
         
         // Add fog for depth
-        this.scene.fog = new THREE.Fog(0x1a0f08, 10, 50);
+        this.scene.fog = new THREE.Fog(0xffeaa7, 15, 40);
     }
     
     setupLighting() {
         // Ambient light for overall illumination
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         this.scene.add(ambientLight);
         
         // Main directional light (warm library lighting)
-        const directionalLight = new THREE.DirectionalLight(0xffd700, 0.8);
+        const directionalLight = new THREE.DirectionalLight(0xfab1a0, 0.7);
         directionalLight.position.set(10, 10, 5);
         directionalLight.castShadow = true;
         directionalLight.shadow.mapSize.width = 2048;
@@ -72,11 +72,11 @@ class BookshelfApp {
         this.scene.add(directionalLight);
         
         // Point lights for cozy atmosphere
-        const pointLight1 = new THREE.PointLight(0xffa500, 0.5, 20);
+        const pointLight1 = new THREE.PointLight(0xfd79a8, 0.4, 20);
         pointLight1.position.set(-5, 8, 3);
         this.scene.add(pointLight1);
         
-        const pointLight2 = new THREE.PointLight(0xffd700, 0.4, 15);
+        const pointLight2 = new THREE.PointLight(0xe17055, 0.3, 15);
         pointLight2.position.set(5, 6, -2);
         this.scene.add(pointLight2);
     }
@@ -88,7 +88,7 @@ class BookshelfApp {
             0.1,
             1000
         );
-        this.camera.position.set(0, 5, 12);
+        this.camera.position.set(0, 3, 8);
         this.camera.lookAt(0, 2, 0);
     }
     
@@ -147,6 +147,16 @@ class BookshelfApp {
         if (this.currentShelf === 'rated') {
             this.arrangeBooks();
         }
+    }
+    
+    async addNewBook(bookData) {
+        const { Book } = await import('./src/Book.js');
+        const book = new Book(bookData, this.scene);
+        await book.init();
+        this.books.push(book);
+        
+        // Rearrange books to show the new one
+        this.arrangeBooks();
     }
     
     animate() {

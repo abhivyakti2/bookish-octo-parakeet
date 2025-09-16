@@ -67,12 +67,12 @@ export class Book {
         
         // Background color based on genre
         const colors = {
-            'Fiction': ['#8B0000', '#FF6B6B'],
-            'Science Fiction': ['#4169E1', '#87CEEB'],
-            'Fantasy': ['#8A2BE2', '#DDA0DD'],
-            'Mystery': ['#2F4F4F', '#708090'],
-            'Romance': ['#FF69B4', '#FFB6C1'],
-            'Non-Fiction': ['#228B22', '#90EE90']
+            'Fiction': ['#fd79a8', '#fdcb6e'],
+            'Science Fiction': ['#74b9ff', '#a29bfe'],
+            'Fantasy': ['#e17055', '#fd79a8'],
+            'Mystery': ['#636e72', '#b2bec3'],
+            'Romance': ['#fd79a8', '#fab1a0'],
+            'Non-Fiction': ['#00b894', '#55efc4']
         };
         
         const colorPair = colors[this.data.genre] || colors['Fiction'];
@@ -127,12 +127,12 @@ export class Book {
         
         // Spine color (darker version of cover)
         const colors = {
-            'Fiction': '#5A0000',
-            'Science Fiction': '#2E4BC7',
-            'Fantasy': '#6A1B9A',
-            'Mystery': '#1C3333',
-            'Romance': '#CC4A7A',
-            'Non-Fiction': '#1A5A1A'
+            'Fiction': '#e84393',
+            'Science Fiction': '#6c5ce7',
+            'Fantasy': '#d63031',
+            'Mystery': '#2d3436',
+            'Romance': '#e84393',
+            'Non-Fiction': '#00a085'
         };
         
         context.fillStyle = colors[this.data.genre] || colors['Fiction'];
@@ -159,11 +159,11 @@ export class Book {
         const context = canvas.getContext('2d');
         
         // Page color
-        context.fillStyle = '#F5F5DC';
+        context.fillStyle = '#fff';
         context.fillRect(0, 0, 256, 64);
         
         // Add some page lines
-        context.strokeStyle = '#E0E0E0';
+        context.strokeStyle = '#fab1a0';
         context.lineWidth = 1;
         for (let i = 10; i < 256; i += 20) {
             context.beginPath();
@@ -255,13 +255,17 @@ export class Book {
     
     showBookModal() {
         const modal = document.getElementById('book-modal');
-        const title = document.getElementById('modal-title');
-        const author = document.getElementById('modal-author');
+        const leftTitle = document.querySelector('.book-cover-preview h3');
+        const leftAuthor = document.querySelector('.book-cover-preview p');
+        const rightTitle = document.getElementById('modal-title');
+        const rightAuthor = document.getElementById('modal-author');
         const notesInput = document.getElementById('book-notes-input');
         const ratingStars = document.querySelectorAll('.star-input');
         
-        title.textContent = this.data.title;
-        author.textContent = `by ${this.data.author}`;
+        leftTitle.textContent = this.data.title;
+        leftAuthor.textContent = this.data.author;
+        rightTitle.textContent = this.data.title;
+        rightAuthor.textContent = `by ${this.data.author}`;
         notesInput.value = this.data.notes || '';
         
         // Set rating stars

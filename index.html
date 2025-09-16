@@ -46,6 +46,7 @@
                     <button class="nav-btn" data-shelf="tbr">TBR</button>
                     <button class="nav-btn active" data-shelf="rated">Rated</button>
                     <button class="nav-btn" data-shelf="genre">Genre</button>
+                    <button class="add-book-btn" id="add-book-btn">+ Add Book</button>
                 </div>
             </div>
             
@@ -61,17 +62,396 @@
         <div id="book-modal" class="book-modal" style="display: none;">
             <div class="modal-content">
                 <button class="close-modal">&times;</button>
-                <div class="book-details">
-                    <h2 id="modal-title"></h2>
-                    <p id="modal-author"></p>
-                    <div class="rating-input">
-                        <label>Your Rating:</label>
-                        <div class="rating-input-stars">
-                            <span class="star-input" data-rating="1">★</span>
-                            <span class="star-input" data-rating="2">★</span>
-                            <span class="star-input" data-rating="3">★</span>
-                            <span class="star-input" data-rating="4">★</span>
-                            <span class="star-input" data-rating="5">★</span>
+                
+                <div class="book-left-page">
+                    <div class="book-cover-preview">
+                        <h3 id="left-title">Book Title</h3>
+                        <p id="left-author">Author Name</p>
+                    </div>
+                </div>
+                
+                <div class="book-right-page">
+                    <div class="book-details">
+                        <h2 id="modal-title"></h2>
+                        <p id="modal-author"></p>
+                        <div class="rating-input">
+                            <label>Your Rating:</label>
+                            <div class="rating-input-stars">
+                                <span class="star-input" data-rating="1">★</span>
+                                <span class="star-input" data-rating="2">★</span>
+                                <span class="star-input" data-rating="3">★</span>
+                                <span class="star-input" data-rating="4">★</span>
+                                <span class="star-input" data-rating="5">★</span>
+                            </div>
+                        </div>
+                        <div class="notes-input">
+                            <label>Notes:</label>
+                            <textarea id="book-notes-input" placeholder="Add your thoughts about this book..."></textarea>
+                        </div>
+                        <button id="save-book-data">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="add-book-modal" class="add-book-modal" style="display: none;">
+            <div class="add-book-content">
+                <button class="close-modal" id="close-add-book">&times;</button>
+                <h2>Add New Book to TBR</h2>
+                <form id="add-book-form">
+                    <div class="form-group">
+                        <label for="new-book-title">Title:</label>
+                        <input type="text" id="new-book-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-book-author">Author:</label>
+                        <input type="text" id="new-book-author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-book-genre">Genre:</label>
+                        <select id="new-book-genre" required>
+                            <option value="Fiction">Fiction</option>
+                            <option value="Science Fiction">Science Fiction</option>
+                            <option value="Fantasy">Fantasy</option>
+                            <option value="Mystery">Mystery</option>
+                            <option value="Romance">Romance</option>
+                            <option value="Non-Fiction">Non-Fiction</option>
+                        </select>
+                    </div>
+                    <div class="add-book-buttons">
+                        <button type="submit" class="btn-primary">Add to TBR</button>
+                        <button type="button" class="btn-secondary" id="cancel-add-book">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="main.js"></script>
+</body>
+</html>
+```
+
+src/UIController.js:
+```
+import { gsap } from '../node_modules/gsap/index.js';
+
+export class UIController {
+    constructor(app) {
+        this.app = app;
+        this.genres = ['Fiction', 'Science Fiction', 'Fantasy', 'Mystery', 'Romance', 'Non-Fiction'];
+        this.currentGenreIndex = 0;
+        this.currentRating = 4;
+        
+        this.setupEventListeners();
+        this.updateGenreDisplay();
+    }
+    
+    setupEventListeners() {
+        // Genre spinner
+        document.querySelectorAll('[data-spinner="genre"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const direction = e.target.classList.contains('next') ? 1 : -1;
+                this.changeGenre(direction);
+            });
+        });
+        
+        // Rating stars
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', (e) => {
+                const rating = parseInt(e.target.dataset.rating);
+                this.setRating(rating);
+            });
+        });
+        
+        // Shelf navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const shelf = e.target.dataset.shelf;
+                this.switchShelf(shelf);
+            });
+        });
+        
+        // Add book button
+        document.getElementById('add-book-btn').addEventListener('click', () => {
+            this.showAddBookModal();
+        });
+        
+        // Book modal
+        this.setupBookModal();
+        this.setupAddBookModal();
+    }
+    
+    setupBookModal() {
+        const modal = document.getElementById('book-modal');
+        const closeBtn = document.querySelector('.close-modal');
+        const saveBtn = document.getElementById('save-book-data');
+        const ratingStars = document.querySelectorAll('.star-input');
+        
+        closeBtn.addEventListener('click', () => this.closeBookModal());
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.closeBookModal();
+            }
+        });
+        
+        // Rating input
+        ratingStars.forEach((star, index) => {
+            star.addEventListener('click', () => {
+                ratingStars.forEach((s, i) => {
+                    s.classList.toggle('active', i <= index);
+                });
+            });
+        });
+        
+        saveBtn.addEventListener('click', () => this.saveBookData());
+    }
+    
+    setupAddBookModal() {
+        const modal = document.getElementById('add-book-modal');
+        const closeBtn = document.getElementById('close-add-book');
+        const cancelBtn = document.getElementById('cancel-add-book');
+        const form = document.getElementById('add-book-form');
+        
+        closeBtn.addEventListener('click', () => this.closeAddBookModal());
+        cancelBtn.addEventListener('click', () => this.closeAddBookModal());
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.closeAddBookModal();
+            }
+        });
+        
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.addNewBook();
+        });
+    }
+    
+    changeGenre(direction) {
+        this.currentGenreIndex = (this.currentGenreIndex + direction + this.genres.length) % this.genres.length;
+        this.updateGenreDisplay();
+        this.app.filterByGenre(this.genres[this.currentGenreIndex]);
+    }
+    
+    updateGenreDisplay() {
+        const display = document.getElementById('genre-display');
+        const newGenre = this.genres[this.currentGenreIndex];
+        
+        gsap.to(display, {
+            duration: 0.2,
+            opacity: 0,
+            onComplete: () => {
+                display.textContent = newGenre;
+                gsap.to(display, {
+                    duration: 0.2,
+                    opacity: 1
+                });
+            }
+        });
+    }
+    
+    setRating(rating) {
+        this.currentRating = rating;
+        
+        document.querySelectorAll('.star').forEach((star, index) => {
+            star.classList.toggle('active', index < rating);
+        });
+        
+        this.app.filterByRating(rating);
+    }
+    
+    switchShelf(shelfType) {
+        // Update active button
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-shelf="${shelfType}"]`).classList.add('active');
+        
+        this.app.switchShelf(shelfType);
+    }
+    
+    updateShelfInfo(shelfType) {
+        const shelfInfo = document.getElementById('current-shelf');
+        const shelfNames = {
+            tbr: 'To Be Read',
+            rated: 'Rated Books',
+            genre: `${this.genres[this.currentGenreIndex]} Books`
+        };
+        
+        gsap.to(shelfInfo, {
+            duration: 0.3,
+            opacity: 0,
+            onComplete: () => {
+                shelfInfo.textContent = shelfNames[shelfType];
+                gsap.to(shelfInfo, {
+                    duration: 0.3,
+                    opacity: 1
+                });
+            }
+        });
+    }
+    
+    showBookInfo(book) {
+        const bookInfo = document.getElementById('book-info');
+        const title = document.getElementById('book-title');
+        const author = document.getElementById('book-author');
+        const notes = document.getElementById('book-notes');
+        
+        title.textContent = book.data.title;
+        author.textContent = `by ${book.data.author}`;
+        notes.textContent = book.data.notes || 'No notes yet...';
+        
+        bookInfo.style.display = 'block';
+        gsap.fromTo(bookInfo, 
+            { opacity: 0, y: 20 },
+            { duration: 0.3, opacity: 1, y: 0 }
+        );
+    }
+    
+    hideBookInfo() {
+        const bookInfo = document.getElementById('book-info');
+        gsap.to(bookInfo, {
+            duration: 0.3,
+            opacity: 0,
+            y: 20,
+            onComplete: () => {
+                bookInfo.style.display = 'none';
+            }
+        });
+    }
+    
+    showAddBookModal() {
+        const modal = document.getElementById('add-book-modal');
+        modal.style.display = 'flex';
+        gsap.fromTo(modal, 
+            { opacity: 0, scale: 0.8 },
+            { duration: 0.3, opacity: 1, scale: 1, ease: "back.out(1.7)" }
+        );
+    }
+    
+    closeAddBookModal() {
+        const modal = document.getElementById('add-book-modal');
+        gsap.to(modal, {
+            duration: 0.3,
+            opacity: 0,
+            scale: 0.8,
+            onComplete: () => {
+                modal.style.display = 'none';
+                document.getElementById('add-book-form').reset();
+            }
+        });
+    }
+    
+    addNewBook() {
+        const title = document.getElementById('new-book-title').value;
+        const author = document.getElementById('new-book-author').value;
+        const genre = document.getElementById('new-book-genre').value;
+        
+        const newBookData = {
+            id: Date.now(), // Simple ID generation
+            title: title,
+            author: author,
+            genre: genre,
+            rating: null,
+            status: 'tbr',
+            notes: ''
+        };
+        
+        // Add to app's book collection
+        this.app.addNewBook(newBookData);
+        
+        // Close modal
+        this.closeAddBookModal();
+        
+        // Switch to TBR shelf to show the new book
+        this.switchShelf('tbr');
+        
+        // Show success message
+        this.showSuccessMessage('Book added to TBR!');
+    }
+    
+    showSuccessMessage(message) {
+        const successDiv = document.createElement('div');
+        successDiv.textContent = message;
+        successDiv.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #00b894;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            z-index: 2000;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0, 184, 148, 0.3);
+        `;
+        
+        document.body.appendChild(successDiv);
+        
+        gsap.fromTo(successDiv, 
+            { opacity: 0, scale: 0.8 },
+            { 
+                duration: 0.3, 
+                opacity: 1, 
+                scale: 1, 
+                ease: "back.out(1.7)",
+                onComplete: () => {
+                    setTimeout(() => {
+                        gsap.to(successDiv, {
+                            duration: 0.3,
+                            opacity: 0,
+                            scale: 0.8,
+                            onComplete: () => {
+                                document.body.removeChild(successDiv);
+                            }
+                        });
+                    }, 2000);
+                }
+            }
+        );
+    }
+    
+    closeBookModal() {
+        const modal = document.getElementById('book-modal');
+        gsap.to(modal, {
+            duration: 0.3,
+            opacity: 0,
+            scale: 0.8,
+            onComplete: () => {
+                modal.style.display = 'none';
+            }
+        });
+    }
+    
+    saveBookData() {
+        const modal = document.getElementById('book-modal');
+        const title = document.getElementById('modal-title').textContent;
+        const notes = document.getElementById('book-notes-input').value;
+        const activeStars = document.querySelectorAll('.star-input.active').length;
+        
+        // Find the book and update its data
+        const book = this.app.books.find(b => b.data.title === title);
+        if (book) {
+            book.data.notes = notes;
+            book.data.rating = activeStars;
+            
+            // Show success animation
+            gsap.to(modal, {
+                duration: 0.3,
+                scale: 1.05,
+                yoyo: true,
+                repeat: 1,
+                ease: "power2.inOut"
+            });
+            
+            setTimeout(() => this.closeBookModal(), 500);
+        }
+    }
+}
+```
                         </div>
                     </div>
                     <div class="notes-input">
